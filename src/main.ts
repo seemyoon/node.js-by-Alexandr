@@ -1,4 +1,6 @@
-const express = require('express');
+import {Request,Response} from "express"
+import express from 'express';
+
 const app = express();
 const PORT = 5100;
 const users = [
@@ -18,11 +20,11 @@ const users = [
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.get("/users", (req, res) => {
+app.get("/users", (req: Request, res: Response) => {
     res.json(users)
 })
 
-app.post("/users", (req, res) => {
+app.post("/users", (req: Request, res: Response) => {
     const newUser = req.body
     users.push(newUser)
     res.json({message: "user was created"})
@@ -31,7 +33,7 @@ app.listen(PORT, () => {
     console.log("Server started on port: " + PORT);
 })
 
-app.put("/users/:id", (req, res) => {
+app.put("/users/:id", (req: Request, res: Response) => {
     const {id} = req.params;
     const updateStateUser = req.body;
     users[+id] = updateStateUser
@@ -41,7 +43,7 @@ app.put("/users/:id", (req, res) => {
     })
 })
 
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", (req: Request, res: Response) => {
     const {id} = req.params;
     users.splice(+id, 1);
     res.status(200).json({message: "user was deleted", data: id})
