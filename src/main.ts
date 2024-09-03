@@ -1,50 +1,30 @@
-import {Request,Response} from "express"
-import express from 'express';
+import express, {NextFunction, Request, Response} from "express";
+import * as mongoose from "mongoose";
+
+import {ApiError} from "./errors/api.error";
+import {userRouter} from "./router/user.router";
+
+const PORT = 5100;
 
 const app = express();
-const PORT = 5100;
-const users = [
-    {name: 'vasya', age: 31, status: false},
-    {name: 'petya', age: 30, status: true},
-    {name: 'kolya', age: 29, status: true},
-    {name: 'olya', age: 28, status: false},
-    {name: 'max', age: 30, status: true},
-    {name: 'anya', age: 31, status: false},
-    {name: 'oleg', age: 28, status: false},
-    {name: 'andrey', age: 29, status: true},
-    {name: 'masha', age: 30, status: true},
-    {name: 'olya', age: 31, status: false},
-    {name: 'max', age: 31, status: true}
-];
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.get("/users", (req: Request, res: Response) => {
-    res.json(users)
-})
-
-app.post("/users", (req: Request, res: Response) => {
-    const newUser = req.body
-    users.push(newUser)
-    res.json({message: "user was created"})
-})
-app.listen(PORT, () => {
-    console.log("Server started on port: " + PORT);
-})
-
-app.put("/users/:id", (req: Request, res: Response) => {
-    const {id} = req.params;
-    const updateStateUser = req.body;
-    users[+id] = updateStateUser
-    res.status(200).json({
-        message: "user was updated",
-        data: updateStateUser[id]
+app.use("/users", userRouter);
+app.use(((err: ApiError, req: Request, res: Response, next: NextFunction) => {
+    const status = err?.status || 500
+    next(err)
+    return res.status(status).json({
+        message: err.message,
+        status,
     })
-})
 
-app.delete("/users/:id", (req: Request, res: Response) => {
-    const {id} = req.params;
-    users.splice(+id, 1);
-    res.status(200).json({message: "user was deleted", data: id})
+}))
+
+
+app.listen(PORT, () => {
+    mongoose.connect("mongodb://127.0.0.1:27017/ASDB");
+    console.log(`Server started on port: ${PORT}`)
 })
