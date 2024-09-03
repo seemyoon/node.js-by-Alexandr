@@ -1,72 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
-const users_db_1 = require("../db/users.db");
 const user_service_1 = require("../services/user.service");
 class UserController {
-    async findAll(req, res) {
+    async findAll(req, res, next) {
         try {
-            const usersFromDB = await user_service_1.userService.findAll();
-            return res.status(200).json(usersFromDB);
+            const users = await user_service_1.userService.findAll();
+            return res.status(200).json(users);
         }
         catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            });
+            next(error);
         }
     }
     async findById(req, res, next) {
         try {
             const { id } = req.params;
-            const user = users_db_1.users[+id];
+            const user = await user_service_1.userService.findById(id);
             return res.status(200).json(user);
         }
         catch (error) {
             next(error);
         }
     }
-    async create(req, res) {
+    async create(req, res, next) {
         try {
-            const newUser = req.body;
-            users_db_1.users.push(newUser);
-            return res.status(201).json({ message: "user was created" });
+            const newUser = await user_service_1.userService.createUser(req.body);
+            return res.status(201).json(newUser);
         }
         catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            });
+            next(error);
         }
     }
-    async updateById(req, res) {
+    async updateById(req, res, next) {
         try {
-            const { id } = req.params;
-            const updateStateUser = req.body;
-            users_db_1.users[+id] = updateStateUser;
-            res.status(200).json({
-                message: "user was updated",
-                data: updateStateUser[id]
-            });
+            const updateUser = await user_service_1.userService.updateUser(req.params.id, req.body);
+            return res.status(200).json(updateUser);
         }
         catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            });
+            next(error);
         }
     }
-    async deleteById(req, res) {
+    async deleteById(req, res, next) {
         try {
-            const { id } = req.params;
-            users_db_1.users.splice(+id, 1);
-            res.status(200).json({ message: "user was deleted", data: id });
+            const deleteUser = await user_service_1.userService.deleteUser(req.params.id);
+            return res.status(200).json(deleteUser);
         }
         catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            });
+            next(error);
         }
     }
 }

@@ -1,16 +1,16 @@
 import {NextFunction, Request, Response} from "express";
 
-import {users} from "../db/users.db";
 import {ApiError} from "../errors/api.error";
+import {userService} from "../services/user.service";
 
 class UserMiddleware {
     public async findByIdOrThrow(req: Request, res: Response, next: NextFunction) {
         try {
             const {id} = req.params
-            const user = users[+id]
+            const user = await userService.findById(id)
 
             if (!user) {
-                throw new ApiError("User not found", 400);
+                throw new ApiError("User not found", 404);
             }
             next()
         } catch (error) {

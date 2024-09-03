@@ -5,7 +5,9 @@ import {userMiddleware} from "../middleware/user.middleware";
 
 const router = Router()
 
-router.get("/:id", userMiddleware.findByIdOrThrow, userController.findById)
+router.get("/:id",
+    userMiddleware.findByIdOrThrow,
+    userController.findById)
 
 router.get("/", userController.findAll)
 

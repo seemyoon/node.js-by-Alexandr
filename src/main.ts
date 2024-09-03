@@ -23,8 +23,8 @@ app.use(((err: ApiError, req: Request, res: Response, next: NextFunction) => {
 
 }))
 
-
 app.listen(PORT, () => {
     mongoose.connect("mongodb://127.0.0.1:27017/ASDB");
     console.log(`Server started on port: ${PORT}`)
 })
+

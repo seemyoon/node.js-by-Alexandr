@@ -1,19 +1,16 @@
 import {NextFunction, Request, Response} from 'express';
 
-import {users} from "../db/users.db";
 import {IUser} from "../models/IUser";
+import {userService} from "../services/user.service";
 
 class UserController {
 
-
-    public async findAll(req: Request, res: Response): Promise<Response<IUser[]>> {
+    public async findAll(req: Request, res: Response, next: NextFunction): Promise<Response<IUser[]>> {
         try {
+            const users = await userService.findAll()
             return res.status(200).json(users)
         } catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            })
+            next(error)
         }
 
     }
@@ -21,58 +18,42 @@ class UserController {
     public async findById(req: Request, res: Response, next: NextFunction): Promise<Response<IUser>> {
         try {
             const {id} = req.params;
-            const user = users[+id];
+            const user = await userService.findById(id);
 
-            return res.status(200).json(user)
+            return res.status(200).json(user);
         } catch (error) {
             next(error)
         }
 
     }
 
-    public async create(req: Request, res: Response): Promise<Response<IUser>> {
+    public async create(req: Request, res: Response, next: NextFunction): Promise<Response<IUser>> {
         try {
-            const newUser = req.body
-            users.push(newUser)
-            return res.status(201).json({message: "user was created"})
+            const newUser = await userService.createUser(req.body)
+            return res.status(201).json(newUser)
         } catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            })
+            next(error)
         }
 
     }
 
-    public async updateById(req: Request, res: Response) {
+    public async updateById(req: Request, res: Response, next: NextFunction): Promise<Response<IUser>> {
         try {
-            const {id} = req.params;
-            const updateStateUser = req.body;
-            users[+id] = updateStateUser
-            res.status(200).json({
-                message: "user was updated",
-                data: updateStateUser[id]
-            })
+            const updateUser = await userService.updateUser(req.params.id, req.body)
+            return res.status(200).json(updateUser)
         } catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            })
+            next(error)
         }
 
 
     }
 
-    public async deleteById(req: Request, res: Response) {
+    public async deleteById(req: Request, res: Response, next: NextFunction): Promise<Response<IUser>> {
         try {
-            const {id} = req.params;
-            users.splice(+id, 1);
-            res.status(200).json({message: "user was deleted", data: id})
+            const deleteUser = await userService.deleteUser(req.params.id)
+            return res.status(200).json(deleteUser)
         } catch (error) {
-            return res.status(400).json({
-                message: error.message,
-                status: error.status || 500,
-            })
+            next(error)
         }
 
 
