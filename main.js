@@ -1,7 +1,5 @@
 const path = require("node:path");
 const fsPromises = require('node:fs/promises');
-const fs = require("node:fs");
-
 
 const createFilesAndFolders = async () => {
 // code to create 5 folder, put 5 files in each
@@ -103,21 +101,41 @@ const createFilesAndFolders = async () => {
 
     const data3 = await fsPromises.readFile(path.join(__dirname, "/new-folder-E", "file3.txt"), "utf-8")
 
-    console.log(data1, data2, data3)
+    // console.log(data1, data2, data3)
 
 
 // code to check, if folder or files
     const pathSomeFolder = path.join(__dirname, "/new-folder-A")
     const stat = await fsPromises.stat(pathSomeFolder);
-    console.log(stat.isFile())
+    // console.log(stat.isFile())
 
     const pathSomeFile = path.join(__dirname, "/new-folder-B")
     const stat2 = await fsPromises.stat(pathSomeFile)
-    console.log(stat2.isDirectory())
+    // console.log(stat2.isDirectory())
 
     const pathSomeFolder2 = path.join(__dirname, "/new-folder-D")
     const stat3 = await fsPromises.stat(pathSomeFolder2)
-    console.log(stat3.isDirectory())
+    // console.log(stat3.isDirectory())
+
+// additional , to add new-folders-A, new-folders-B, new-folders-C, new-folders-D, new-folders-E to baseFolder
+    const foldersPathArray = [
+        "/new-folder-A",
+        "/new-folder-B",
+        "/new-folder-C",
+        "/new-folder-D",
+        "/new-folder-E",
+    ]
+
+    await fsPromises.mkdir(path.join(__dirname, "baseFolder"), {recursive: true})
+    const baseFolder = path.join(__dirname, "/baseFolder")
+
+
+    for (const folderPathArray of foldersPathArray) {
+        await fsPromises.rename(path.join(__dirname, folderPathArray),
+            path.join(baseFolder, folderPathArray))
+    }
+
 }
+
 
 void createFilesAndFolders()
