@@ -1,0 +1,20 @@
+A.useOSModules:
+1.use os.arch()
+2.use os.cpus()
+3.use os.totalmem()
+4.use os.freemem()
+5.use os.homedir()
+6.use os.hostname()
+7.use os.platform()
+8.use os.userInfo()
+B.and useFSModules:
++1. create baseFolder, which has 4 folder, in this folder add 2 files
++2. fill each file with content "hello from file ..."
++3. add some changes to unpaired files with content "Some changes in file" and set time
++4. remove fourth folder and also remove 2 file in second folder
++5. move every all folders to new folder "newBaseFolder"
++6. copy second file from folder 1 to new folder "folder 5" (must create)
++7. check if content in folder 5 is files
++8. take file (about 50MB) and use streams the same do with pipe
++9. execute example with readline (What is your favourite food?)
+10. use events
