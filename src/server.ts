@@ -103,7 +103,7 @@ app.put("/users/:userId", (req: Request, res: Response) => {
 app.delete("/users/:userId", (req: Request, res: Response) => {
     try {
         const userId = Number(req.params.userId);
-        const userIndex = users.findIndex(user => user.id !== userId);
+        const userIndex = users.findIndex(user => user.id === userId);
         if (userIndex === -1) return res.status(404).json({message: "user not found"})
         users.splice(userIndex, 1);
         fs.writeFileSync(usersJSON, JSON.stringify(users), "utf8")

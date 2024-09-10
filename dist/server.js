@@ -99,7 +99,7 @@ app.put("/users/:userId", (req, res) => {
 app.delete("/users/:userId", (req, res) => {
     try {
         const userId = Number(req.params.userId);
-        const userIndex = users.findIndex(user => user.id !== userId);
+        const userIndex = users.findIndex(user => user.id === userId);
         if (userIndex === -1)
             return res.status(404).json({ message: "user not found" });
         users.splice(userIndex, 1);
