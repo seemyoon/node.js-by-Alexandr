@@ -26,7 +26,7 @@ class UserRepository {
         return users.find(user => user.id === userId)
     }
 
-    public async updateUserById(userId: number, dto: Partial<IUser>): Promise<void> {
+    public async updateUserById(userId: number, dto: Partial<IUser>): Promise<IUser> {
         const users = await read()
         const userIndex = users.findIndex(user => user.id === userId)
         if (userIndex === 1) throw new ApiError("User not found", 404)
@@ -35,15 +35,17 @@ class UserRepository {
         users[userIndex].password = dto.password
 
         await write(users)
+        return users[userIndex]
     }
 
-    public async deleteUserById(userId: number): Promise<void> {
+    public async deleteUserById(userId: number): Promise<IUser> {
         const users = await read()
         const userIndex = users.findIndex(user => user.id === userId);
         if (userIndex === -1) throw new ApiError("User not found", 404)
         users.splice(userIndex, 1);
 
         await write(users)
+        return users[userIndex]
     }
 }
 

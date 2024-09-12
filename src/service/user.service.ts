@@ -20,14 +20,14 @@ class UserService {
         return user
     }
 
-    public async updateUserById(id: number, dto: Partial<IUser>): Promise<void> {
+    public async updateUserById(id: number, dto: Partial<IUser>): Promise<IUser> {
         const {error} = UserValidators.createUser.validate(dto)
         if (error) throw new ApiError("Invalid fields", 400)
         return await userRepository.updateUserById(id, dto)
     }
 
-    public async deleteUserById(userId: number): Promise<void> {
-        await userRepository.deleteUserById(userId)
+    public async deleteUserById(userId: number): Promise<IUser> {
+       return await userRepository.deleteUserById(userId)
     }
 
 }
