@@ -49,7 +49,7 @@ class UserController {
         try {
             const userId = Number(req.params.userId);
             const result = await userService.deleteUserById(userId)
-            res.status(201).json(result)
+            res.status(204).json(result)
         } catch (error) {
             next(error)
         }
