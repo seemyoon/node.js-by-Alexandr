@@ -74,3 +74,4 @@ fabric.properties
 /.idea/.gitignore
 /.idea/*.*
 /dist/
+/.env

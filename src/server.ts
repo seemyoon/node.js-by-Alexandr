@@ -1,9 +1,10 @@
 import express, {NextFunction} from "express";
 import {userRouter} from "./router/user.router";
 import {ApiError} from "./errors/customApiError";
+import {configs} from "./config/config";
+import * as mongoose from 'mongoose'
 
 const app = express();
-const PORT = 5200;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -21,4 +22,8 @@ process.on("uncaughtException", (error) => {
     process.exit(1);
 })
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+app.listen(configs.APP_PORT, async () => {
+    await mongoose.connect(configs.APP_MONGO_URL)
+    console.log(`Server running on http://${configs.APP_HOST}:${configs.APP_PORT}`)
+})
+
