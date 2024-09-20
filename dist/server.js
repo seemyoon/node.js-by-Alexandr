@@ -30,10 +30,12 @@ const express_1 = __importDefault(require("express"));
 const user_router_1 = require("./router/user.router");
 const config_1 = require("./config/config");
 const mongoose = __importStar(require("mongoose"));
+const auth_router_1 = require("./router/auth.router");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/users", user_router_1.userRouter);
+app.use("/auth", auth_router_1.authRouter);
 app.use("*", (err, req, res, next) => {
     res.status(err.status || 500).json({ message: err.message });
     next();

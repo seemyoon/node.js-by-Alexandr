@@ -12,41 +12,42 @@ class UserController {
             next(error);
         }
     }
-    async create(req, res, next) {
+    async getById(req, res, next) {
         try {
+            const id = req.params.userId;
+            const result = await user_service_1.userService.getById(id);
+            res.status(201).json(result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getMe(req, res, next) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload;
+            console.log(jwtPayload);
+            const result = await user_service_1.userService.getMe(jwtPayload);
+            res.json(result);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async updateMe(req, res, next) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload;
             const dto = req.body;
-            const result = await user_service_1.userService.create(dto);
+            const result = await user_service_1.userService.updateMe(jwtPayload, dto);
             res.status(201).json(result);
         }
         catch (error) {
             next(error);
         }
     }
-    async getUserById(req, res, next) {
+    async deleteMe(req, res, next) {
         try {
-            const id = String(req.params.userId);
-            const result = await user_service_1.userService.getUserById(id);
-            res.status(201).json(result);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    async updateUserById(req, res, next) {
-        try {
-            const id = String(req.params.userId);
-            const dto = req.body;
-            const result = await user_service_1.userService.updateUserById(id, dto);
-            res.status(201).json(result);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    async deleteUserById(req, res, next) {
-        try {
-            const userId = String(req.params.userId);
-            const result = await user_service_1.userService.deleteUserById(userId);
+            const jwtPayload = req.res.locals.jwtPayload;
+            const result = await user_service_1.userService.deleteMe(jwtPayload);
             res.status(204).json(result);
         }
         catch (error) {

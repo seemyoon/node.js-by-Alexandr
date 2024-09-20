@@ -1,28 +1,30 @@
 import {IUser} from "../interfaces/user.interface";
 import {userRepository} from "../repository/user.repository";
 import {ApiError} from "../errors/customApiError";
+import {ITokenPayload} from "../interfaces/token.interface";
 
 class UserService {
     public async getListUsers(): Promise<IUser[]> {
         return await userRepository.getListUsers()
     }
 
-    public async create(dto: Partial<IUser>): Promise<IUser> {
-        return await userRepository.create(dto)
+    public async getById(userId: string): Promise<IUser> {
+        const user = await userRepository.getById(userId)
+        if (!user) throw new ApiError("User not found", 404)
+        return user
     }
-
-    public async getUserById(userId: string): Promise<IUser> {
-        const user = await userRepository.getUserById(userId)
+    public async getMe(jwtPayload: ITokenPayload): Promise<IUser> {
+        const user = await userRepository.getById(jwtPayload.userId)
         if (!user) throw new ApiError("User not found", 404)
         return user
     }
 
-    public async updateUserById(id: string, dto: Partial<IUser>): Promise<IUser> {
-        return await userRepository.updateUserById(id, dto)
+    public async updateMe(jwtPayload: ITokenPayload, dto: Partial<IUser>): Promise<IUser> {
+        return await userRepository.updateById(jwtPayload.userId, dto)
     }
 
-    public async deleteUserById(userId: string): Promise<void> {
-       return await userRepository.deleteUserById(userId)
+    public async deleteMe(jwtPayload: ITokenPayload): Promise<void> {
+       return await userRepository.deleteById(jwtPayload.userId)
     }
 
 }

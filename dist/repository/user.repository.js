@@ -9,13 +9,16 @@ class UserRepository {
     async create(dto) {
         return await user_model_1.User.create({ ...dto });
     }
-    async getUserById(userId) {
+    async getById(userId) {
         return await user_model_1.User.findById(userId);
     }
-    async updateUserById(userId, dto) {
+    async getByEmail(email) {
+        return await user_model_1.User.findOne({ email }).select("+password");
+    }
+    async updateById(userId, dto) {
         return await user_model_1.User.findByIdAndUpdate(userId, dto, { new: true });
     }
-    async deleteUserById(userId) {
+    async deleteById(userId) {
         await user_model_1.User.deleteOne({ _id: userId });
     }
 }

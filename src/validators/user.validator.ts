@@ -1,5 +1,5 @@
 import joi from "joi";
-import {regexConstant} from "../constants/regex.constants";
+import {regexConstant} from "../constants/regex.constant";
 
 export class UserValidator {
     private static email = joi.string()
@@ -24,6 +24,7 @@ export class UserValidator {
         .min(5)
         .max(40)
         .regex(regexConstant.PHONE)
+    static signIn = joi.object()
     static createUser = joi.object({
         email: this.email,
         password: this.password,
@@ -31,7 +32,7 @@ export class UserValidator {
         phone: this.phone,
         name: this.name,
     })
-    static updateUser = joi.object({
+    static update = joi.object({
         age: this.age,
         phone: this.phone,
         name: this.name,

@@ -7,20 +7,23 @@ class UserService {
     async getListUsers() {
         return await user_repository_1.userRepository.getListUsers();
     }
-    async create(dto) {
-        return await user_repository_1.userRepository.create(dto);
-    }
-    async getUserById(userId) {
-        const user = await user_repository_1.userRepository.getUserById(userId);
+    async getById(userId) {
+        const user = await user_repository_1.userRepository.getById(userId);
         if (!user)
             throw new customApiError_1.ApiError("User not found", 404);
         return user;
     }
-    async updateUserById(id, dto) {
-        return await user_repository_1.userRepository.updateUserById(id, dto);
+    async getMe(jwtPayload) {
+        const user = await user_repository_1.userRepository.getById(jwtPayload.userId);
+        if (!user)
+            throw new customApiError_1.ApiError("User not found", 404);
+        return user;
     }
-    async deleteUserById(userId) {
-        return await user_repository_1.userRepository.deleteUserById(userId);
+    async updateMe(jwtPayload, dto) {
+        return await user_repository_1.userRepository.updateById(jwtPayload.userId, dto);
+    }
+    async deleteMe(jwtPayload) {
+        return await user_repository_1.userRepository.deleteById(jwtPayload.userId);
     }
 }
 exports.userService = new UserService();

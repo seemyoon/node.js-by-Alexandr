@@ -1,8 +1,9 @@
-import express, {NextFunction} from "express";
+import express, {Response, Request, NextFunction} from "express";
 import {userRouter} from "./router/user.router";
 import {ApiError} from "./errors/customApiError";
 import {configs} from "./config/config";
 import * as mongoose from 'mongoose'
+import {authRouter} from "./router/auth.router";
 
 const app = express();
 
@@ -10,9 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.use("/users", userRouter)
+app.use("/auth", authRouter)
 
-
-app.use("*", (err: ApiError, req: express.Request, res: express.Response, next: NextFunction) => {
+app.use("*", (err: ApiError, req: Request, res: Response, next: NextFunction) => {
     res.status(err.status || 500).json({message: err.message});
     next()
 })

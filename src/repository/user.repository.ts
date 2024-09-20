@@ -11,17 +11,22 @@ class UserRepository {
         return await User.create({...dto})
     }
 
-    public async getUserById(userId: string): Promise<IUser | null> {
+    public async getById(userId: string): Promise<IUser | null> {
         return await User.findById(userId)
     }
 
-    public async updateUserById(userId: string, dto: Partial<IUser>): Promise<IUser> {
+    public async getByEmail(email: string): Promise<IUser| null> {
+        return await User.findOne({email}).select("+password")
+    }
+
+    public async updateById(userId: string, dto: Partial<IUser>): Promise<IUser> {
         return await User.findByIdAndUpdate(userId, dto, {new: true})
     }
 
-    public async deleteUserById(userId: string): Promise<void> {
+    public async deleteById(userId: string): Promise<void> {
         await User.deleteOne({_id: userId})
     }
+
 }
 
 
