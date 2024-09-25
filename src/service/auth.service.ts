@@ -5,6 +5,9 @@ import {ApiError} from "../errors/customApiError";
 import {passwordService} from "./password.service";
 import {tokenService} from "./token.service";
 import {tokenRepository} from "../repository/token.repository";
+import {emailService} from "./email.service";
+import {EmailTypeEnum} from "../enums/email.enum";
+import {configs} from "../config/config";
 
 class AuthService {
     public async signUp(dto: Partial<IUser>): Promise<{ user: IUser, tokens: ITokenPair }> {
@@ -13,11 +16,12 @@ class AuthService {
         const user = await userRepository.create({...dto, password})
         const tokens = tokenService.generateToken({userId: user._id, role: user.role})
         await tokenRepository.create({...tokens, _userId: user._id})
+        await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.WELCOME, {name: user.name})
         return {user, tokens}
     }
 
 
-    public async signIn(dto: Partial<IUser>): Promise<{ user: IUser , tokens: ITokenPair}> {
+    public async signIn(dto: Partial<IUser>): Promise<{ user: IUser, tokens: ITokenPair }> {
         const user = await userRepository.getByEmail(dto.email)
         if (!user) throw new ApiError("User not found", 404)
 
@@ -37,6 +41,19 @@ class AuthService {
 
         await tokenRepository.create({...tokens, _userId: payload.userId})
         return tokens
+    }
+
+    public async logOutDevice(tokenId: string, jwtPayload: ITokenPayload): Promise<void> {
+        const user = await userRepository.getById(jwtPayload.userId)
+        await tokenRepository.deleteByParams({_id: tokenId});
+        await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.LOGOUT, {name: user.name})
+
+    }
+
+    public async logOutAllDevices(jwtPayload: ITokenPayload): Promise<void> {
+        const user = await userRepository.getById(jwtPayload.userId)
+        await tokenRepository.deleteManyByParams({_userId: user._id})
+        await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.LOGOUT, {name: user.name})
     }
 
     private async isEmailExistOrThrow(email: string): Promise<void> {

@@ -6,9 +6,12 @@ import {UserValidator} from "../validators/user.validator";
 
 const router = Router();
 
-router.post("/sign-in", authController.signIn)
+router.post("/sign-in", commonMiddleware.isBodyValid(UserValidator.signIn), authController.signIn)
 router.post("/sign-up", commonMiddleware.isBodyValid(UserValidator.createUser), authController.signUp);
 
 router.post("/refresh", authMiddleware.checkRefreshToken, authController.refreshToken)
+
+router.post("/logOutDevice", authMiddleware.checkAccessToken, authController.logOutDevice)
+router.post("/logOutManyDevices", authMiddleware.checkAccessToken, authController.logOutManyDevices)
 
 export const authRouter = router

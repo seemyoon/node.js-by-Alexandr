@@ -38,6 +38,29 @@ class AuthController {
 
     }
 
+    public async logOutDevice(req: Request, res: Response, next: NextFunction) {
+        try {
+            const tokenId = req.res.locals.tokenId as string
+            const jwtPayload = req.res.locals.jwtPayload as ITokenPayload
+
+            await authService.logOutDevice(tokenId, jwtPayload)
+            res.sendStatus(204)
+        } catch (error) {
+            next(error)
+        }
+
+    }
+
+    public async logOutManyDevices(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload as ITokenPayload
+
+             await authService.logOutAllDevices(jwtPayload)
+            res.sendStatus(204)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export const authController = new AuthController();
