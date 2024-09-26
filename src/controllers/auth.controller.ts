@@ -87,10 +87,12 @@ class AuthController {
 
     public async verify(req: Request, res: Response, next: NextFunction) {
         try {
-            // const dto = req.body as IResetPasswordSend;
+            const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
 
+            await authService.verify(jwtPayload)
+            res.status(200)
         } catch (error) {
-         next(error)
+            next(error)
         }
     }
 }

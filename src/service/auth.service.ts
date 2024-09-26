@@ -93,6 +93,15 @@ class AuthService {
     }
 
 
+    public async verify(jwtPayload: ITokenPayload): Promise<void> {
+        await userRepository.updateById(jwtPayload.userId, {isVerified: true})
+
+        await actionTokenRepository.deleteManyByParams({
+            _userId: jwtPayload.userId,
+            type: ActionTokenTypeEnum.VERIFY_EMAIL
+        })
+        await tokenRepository.deleteManyByParams({_userId: jwtPayload.userId})
+    }
 
     private async isEmailExistOrThrow(email: string): Promise<void> {
         const user = await userRepository.getByEmail(email)

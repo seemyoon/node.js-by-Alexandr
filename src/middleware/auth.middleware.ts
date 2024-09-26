@@ -3,7 +3,6 @@ import {ApiError} from "../errors/customApiError";
 import {tokenService} from "../service/token.service";
 import {TokenTypeEnum} from "../enums/tokenType.enum";
 import {tokenRepository} from "../repository/token.repository";
-import {IResetPasswordChange} from "../interfaces/user.interface";
 import {actionTokenRepository} from "../repository/action-token.repository";
 import {ActionTokenTypeEnum} from "../enums/actionTokenType.enum";
 
@@ -48,18 +47,21 @@ class AuthMiddleware {
         }
     }
 
-    public async checkActionToken(req: Request, res: Response, next: NextFunction) {
-        try {
-            const {token} = req.body as IResetPasswordChange
-            const payload = tokenService.verifyActionToken(token, ActionTokenTypeEnum.FORGOT_PASSWORD);
-            const tokenEntity = await actionTokenRepository.getByToken(token);
-            if (!tokenEntity) {
-                throw new ApiError("Token is not valid", 401)
+    public checkActionToken(type: ActionTokenTypeEnum) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const token = req.body.token as string
+                if (!token) throw new ApiError("Token is not provided", 401)
+                const payload = tokenService.verifyActionToken(token, type);
+                const tokenEntity = await actionTokenRepository.getByToken(token);
+                if (!tokenEntity) {
+                    throw new ApiError("Token is not valid", 401)
+                }
+                req.res.locals.jwtPayload = payload;
+                next()
+            } catch (error) {
+                next(error);
             }
-            req.res.locals.jwtPayload = payload;
-            next()
-        } catch (error) {
-            next(error);
         }
     }
 

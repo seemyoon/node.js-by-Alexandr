@@ -3,6 +3,7 @@ import {authController} from "../controllers/auth.controller";
 import {authMiddleware} from "../middleware/auth.middleware";
 import {commonMiddleware} from "../middleware/common.middleware";
 import {UserValidator} from "../validators/user.validator";
+import {ActionTokenTypeEnum} from "../enums/actionTokenType.enum";
 
 const router = Router();
 
@@ -15,8 +16,8 @@ router.post("/logOutDevice", authMiddleware.checkAccessToken, authController.log
 router.post("/logOutManyDevices", authMiddleware.checkAccessToken, authController.logOutManyDevices)
 
 router.post("/forgot-password", authController.forgotPasswordSendEmail)
-router.put("/forgot-password",authMiddleware.checkActionToken, authController.forgotPasswordChange)
+router.put("/forgot-password", authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD), authController.forgotPasswordChange)
 
-router.put("/verify", authController.verify)
+router.put("/verify", authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL), authController.verify)
 
 export const authRouter = router
