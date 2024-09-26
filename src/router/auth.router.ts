@@ -14,4 +14,9 @@ router.post("/refresh", authMiddleware.checkRefreshToken, authController.refresh
 router.post("/logOutDevice", authMiddleware.checkAccessToken, authController.logOutDevice)
 router.post("/logOutManyDevices", authMiddleware.checkAccessToken, authController.logOutManyDevices)
 
+router.post("/forgot-password", authController.forgotPasswordSendEmail)
+router.put("/forgot-password",authMiddleware.checkActionToken, authController.forgotPasswordChange)
+
+router.put("/verify", authController.verify)
+
 export const authRouter = router

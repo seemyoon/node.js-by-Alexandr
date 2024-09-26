@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {ISignIn, IUser} from "../interfaces/user.interface";
+import {IResetPasswordChange, IResetPasswordSend, ISignIn, IUser} from "../interfaces/user.interface";
 import {authService} from "../service/auth.service";
 import {ITokenPayload} from "../interfaces/token.interface";
 
@@ -55,10 +55,42 @@ class AuthController {
         try {
             const jwtPayload = req.res.locals.jwtPayload as ITokenPayload
 
-             await authService.logOutAllDevices(jwtPayload)
+            await authService.logOutAllDevices(jwtPayload)
             res.sendStatus(204)
         } catch (error) {
             next(error)
+        }
+    }
+
+    public async forgotPasswordSendEmail(req: Request, res: Response, next: NextFunction) {
+        try {
+            const dto = req.body as IResetPasswordSend
+            await authService.forgotPasswordSendEmail(dto)
+            res.sendStatus(204)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public async forgotPasswordChange(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+            const dto = req.body as IResetPasswordChange;
+
+            await authService.forgotPasswordChange(dto, jwtPayload)
+            res.sendStatus(204)
+        } catch (error) {
+            next(error)
+        }
+
+    }
+
+    public async verify(req: Request, res: Response, next: NextFunction) {
+        try {
+            // const dto = req.body as IResetPasswordSend;
+
+        } catch (error) {
+         next(error)
         }
     }
 }
