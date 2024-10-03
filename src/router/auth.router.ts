@@ -15,8 +15,10 @@ router.post("/refresh", authMiddleware.checkRefreshToken, authController.refresh
 router.post("/logOutDevice", authMiddleware.checkAccessToken, authController.logOutDevice)
 router.post("/logOutManyDevices", authMiddleware.checkAccessToken, authController.logOutManyDevices)
 
-router.post("/forgot-password", authController.forgotPasswordSendEmail)
-router.put("/forgot-password", authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD), authController.forgotPasswordChange)
+router.post("/password/forgot", authController.forgotPasswordSendEmail)
+router.put("/password/forgot", authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD), authController.forgotPasswordChange)
+
+router.post("/password/change", authMiddleware.checkAccessToken, commonMiddleware.isBodyValid(UserValidator.changePassword), authController.changePassword)
 
 router.put("/verify", authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL), authController.verify)
 

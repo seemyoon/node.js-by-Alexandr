@@ -6,7 +6,7 @@ import {ApiError} from "../errors/customApiError";
 import {ActionTokenTypeEnum} from "../enums/actionTokenType.enum";
 
 class TokenService {
-    public generateToken(payload: ITokenPayload): ITokenPair {
+    public generateTokens(payload: ITokenPayload): ITokenPair {
         const accessToken = jwt.sign(payload, configs.JWT_ACCESS_SECRET, {expiresIn: configs.JWT_ACCESS_EXPIRATION});
         const refreshToken = jwt.sign(payload, configs.JWT_REFRESH_SECRET, {expiresIn: configs.JWT_REFRESH_EXPIRATION});
         return {accessToken, refreshToken}
@@ -64,6 +64,10 @@ class TokenService {
                 secret = configs.ACTION_FORGOT_PASSWORD_SECRET;
                 expiresIn = configs.ACTION_FORGOT_PASSWORD_EXPIRATION;
                 break;
+            case ActionTokenTypeEnum.VERIFY_EMAIL:
+                secret = configs.ACTION_VERIFY_EMAIL_SECRET;
+                expiresIn = configs.ACTION_VERIFY_EMAIL_EXPIRATION;
+                break
             default:
                 throw new ApiError("Invalid token", 401);
         }

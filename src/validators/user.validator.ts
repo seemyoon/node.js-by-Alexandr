@@ -24,21 +24,26 @@ export class UserValidator {
         .min(5)
         .max(40)
         .regex(regexConstant.PHONE)
-    static signIn = joi.object({
+    public static signIn = joi.object({
         email: this.email.required(),
         password: this.password.required(),
     })
-    static createUser = joi.object({
+    public static createUser = joi.object({
         email: this.email,
         password: this.password,
         age: this.age,
         phone: this.phone,
         name: this.name,
     })
-    static update = joi.object({
+    public static changePassword = joi.object({
+        oldPassword: this.password.required(),
+        password: this.password.required()
+    })
+    public static update = joi.object({
         age: this.age,
         phone: this.phone,
         name: this.name,
     })
+
 }
 

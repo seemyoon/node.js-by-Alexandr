@@ -31,6 +31,7 @@ const user_router_1 = require("./router/user.router");
 const config_1 = require("./config/config");
 const mongoose = __importStar(require("mongoose"));
 const auth_router_1 = require("./router/auth.router");
+const cron_1 = require("./cron");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -46,5 +47,6 @@ process.on("uncaughtException", (error) => {
 });
 app.listen(config_1.configs.APP_PORT, async () => {
     await mongoose.connect(config_1.configs.APP_MONGO_URL);
+    (0, cron_1.cronRunner)();
     console.log(`Server running on http://${config_1.configs.APP_HOST}:${config_1.configs.APP_PORT}`);
 });

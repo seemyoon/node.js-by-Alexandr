@@ -1,4 +1,4 @@
-import {IResetPasswordChange, IResetPasswordSend, IUser} from "../interfaces/user.interface";
+import {IChangePassword, IResetPasswordChange, IResetPasswordSend, IUser} from "../interfaces/user.interface";
 import {ITokenPair, ITokenPayload} from "../interfaces/token.interface";
 import {userRepository} from "../repository/user.repository";
 import {ApiError} from "../errors/customApiError";
@@ -10,18 +10,24 @@ import {EmailTypeEnum} from "../enums/email.enum";
 import {configs} from "../config/config";
 import {ActionTokenTypeEnum} from "../enums/actionTokenType.enum";
 import {actionTokenRepository} from "../repository/action-token.repository";
+import {oldPasswordRepository} from "../repository/old-password.repository";
 
 class AuthService {
     public async signUp(dto: Partial<IUser>): Promise<{ user: IUser, tokens: ITokenPair }> {
         await this.isEmailExistOrThrow(dto.email)
         const password = await passwordService.hashPassword(dto.password)
         const user = await userRepository.create({...dto, password})
-        const tokens = tokenService.generateToken({userId: user._id, role: user.role})
+        const tokens = tokenService.generateTokens({userId: user._id, role: user.role})
         await tokenRepository.create({...tokens, _userId: user._id})
+        const token = tokenService.generateActionTokens({
+            userId: user._id,
+            role: user.role,
+        }, ActionTokenTypeEnum.VERIFY_EMAIL)
+        await actionTokenRepository.create({_userId: user._id, type: ActionTokenTypeEnum.VERIFY_EMAIL, token})
         await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.WELCOME,
             {
                 name: user.name,
-                verify: user.isVerified
+                actionToken: token
             })
         return {user, tokens}
     }
@@ -34,7 +40,7 @@ class AuthService {
         const isPasswordMatch = await passwordService.comparePassword(dto.password, user.password)
         if (!isPasswordMatch) throw new ApiError("Invalid fields", 401)
 
-        const tokens = tokenService.generateToken({userId: user._id, role: user.role})
+        const tokens = tokenService.generateTokens({userId: user._id, role: user.role})
 
         await tokenRepository.create({...tokens, _userId: user._id})
         return {user, tokens}
@@ -43,7 +49,7 @@ class AuthService {
     public async refresh(refreshToken: string, payload: ITokenPayload): Promise<ITokenPair> {
         await tokenRepository.deleteByParams({refreshToken})
 
-        const tokens = tokenService.generateToken({userId: payload.userId, role: payload.role})
+        const tokens = tokenService.generateTokens({userId: payload.userId, role: payload.role})
 
         await tokenRepository.create({...tokens, _userId: payload.userId})
         return tokens
@@ -82,13 +88,25 @@ class AuthService {
     }
 
     public async forgotPasswordChange(dto: IResetPasswordChange, jwtPayload: ITokenPayload): Promise<void> {
+        const user = await userRepository.getById(jwtPayload.userId)
+        const oldPasswords = await oldPasswordRepository.findByParams(user._id)
+
+        await Promise.all(oldPasswords.map(async (oldPassword) => {
+            const isPrevious = await passwordService.comparePassword(dto.password, oldPassword.password)
+            if (isPrevious) throw new ApiError("Password already used", 409)
+        }))
+
         const password = await passwordService.hashPassword(dto.password)
         await userRepository.updateById(jwtPayload.userId, {password})
-
+        await oldPasswordRepository.create({
+            _userId: jwtPayload.userId,
+            password: user.password
+        })
         await actionTokenRepository.deleteManyByParams({
             _userId: jwtPayload.userId,
             type: ActionTokenTypeEnum.FORGOT_PASSWORD
         })
+
         await tokenRepository.deleteManyByParams({_userId: jwtPayload.userId})
     }
 
@@ -101,6 +119,33 @@ class AuthService {
             type: ActionTokenTypeEnum.VERIFY_EMAIL
         })
         await tokenRepository.deleteManyByParams({_userId: jwtPayload.userId})
+    }
+
+    public async changePassword(jwtPayload: ITokenPayload, dto: IChangePassword): Promise<void> {
+        const user = await userRepository.getById(jwtPayload.userId)
+        const passwordCorrect = await passwordService.comparePassword(dto.oldPassword, user.password)
+
+        if (!passwordCorrect) throw new ApiError("Invalid previous password", 401)
+        const oldPasswords = await oldPasswordRepository.findByParams(user._id)
+
+        const passwords = [...oldPasswords, {password: user.password}]
+        await Promise.all(passwords.map(async (oldPassword) => {
+            const isPrevious = await passwordService.comparePassword(
+                dto.password,
+                oldPassword.password,
+            );
+            if (isPrevious) {
+                throw new ApiError("Password already used", 409);
+            }
+        }))
+        const password = await passwordService.hashPassword(dto.password);
+        await userRepository.updateById(jwtPayload.userId, {password});
+        await oldPasswordRepository.create({
+            _userId: jwtPayload.userId,
+            password: user.password,
+        });
+        await tokenRepository.deleteManyByParams({_userId: jwtPayload.userId})
+
     }
 
     private async isEmailExistOrThrow(email: string): Promise<void> {

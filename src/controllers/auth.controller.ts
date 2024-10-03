@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {IResetPasswordChange, IResetPasswordSend, ISignIn, IUser} from "../interfaces/user.interface";
+import {IChangePassword, IResetPasswordChange, IResetPasswordSend, ISignIn, IUser} from "../interfaces/user.interface";
 import {authService} from "../service/auth.service";
 import {ITokenPayload} from "../interfaces/token.interface";
 
@@ -90,7 +90,19 @@ class AuthController {
             const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
 
             await authService.verify(jwtPayload)
-            res.status(200)
+            res.sendStatus(204)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public async changePassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+            const dto = req.body as IChangePassword
+
+            await authService.changePassword(jwtPayload, dto)
+            res.sendStatus(204)
         } catch (error) {
             next(error)
         }

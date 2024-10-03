@@ -4,6 +4,7 @@ import {ApiError} from "./errors/customApiError";
 import {configs} from "./config/config";
 import * as mongoose from 'mongoose'
 import {authRouter} from "./router/auth.router";
+import {cronRunner} from "./cron";
 
 const app = express();
 
@@ -25,6 +26,7 @@ process.on("uncaughtException", (error) => {
 
 app.listen(configs.APP_PORT, async () => {
     await mongoose.connect(configs.APP_MONGO_URL)
+    cronRunner()
     console.log(`Server running on http://${configs.APP_HOST}:${configs.APP_PORT}`)
 })
 
