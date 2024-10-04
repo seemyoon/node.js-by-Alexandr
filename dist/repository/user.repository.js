@@ -35,6 +35,9 @@ class UserRepository {
                     as: "tokens"
                 }
             },
+            {
+                $match: { tokens: { $size: 0 } }
+            }
         ]);
     }
 }

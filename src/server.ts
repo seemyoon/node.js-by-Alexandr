@@ -4,12 +4,14 @@ import {ApiError} from "./errors/customApiError";
 import {configs} from "./config/config";
 import * as mongoose from 'mongoose'
 import {authRouter} from "./router/auth.router";
+import fileUpload from "express-fileupload";
 // import {cronRunner} from "./cron";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(fileUpload())
 
 app.use("/users", userRouter)
 app.use("/auth", authRouter)
