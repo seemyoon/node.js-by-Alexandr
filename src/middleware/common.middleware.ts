@@ -21,15 +21,25 @@ class CommonMiddleware {
     public isBodyValid(validator: ObjectSchema) {
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const {error} = await validator.validateAsync(req.body)
-                if (error) throw new ApiError(error.message, 400)
+                req.body = await validator.validateAsync(req.body)
                 next()
             } catch (error) {
-                next(error)
+                next(new ApiError(error.details[0].message, 400))
             }
 
         }
 
+    }
+
+    public isQueryValid(validator: ObjectSchema) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                req.query = await validator.validateAsync(req.query)
+                next()
+            } catch (error) {
+                next(new ApiError(error.details[0].message, 400))
+            }
+        }
     }
 
 }

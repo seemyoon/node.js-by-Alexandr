@@ -9,7 +9,7 @@ const auth_middleware_1 = require("../middleware/auth.middleware");
 const file_middleware_1 = require("../middleware/file.middleware");
 const image_constants_1 = require("../constants/image.constants");
 const router = (0, express_1.Router)();
-router.get("/", user_controller_1.userController.getList);
+router.get("/", common_middleware_1.commonMiddleware.isQueryValid(user_validator_1.UserValidator.isQuery), user_controller_1.userController.getList);
 router.get("/me", auth_middleware_1.authMiddleware.checkAccessToken, user_controller_1.userController.getMe);
 router.put("/me", auth_middleware_1.authMiddleware.checkAccessToken, common_middleware_1.commonMiddleware.isBodyValid(user_validator_1.UserValidator.update), user_controller_1.userController.updateMe);
 router.delete("/me", auth_middleware_1.authMiddleware.checkAccessToken, user_controller_1.userController.deleteMe);

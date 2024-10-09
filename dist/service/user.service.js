@@ -5,9 +5,11 @@ const user_repository_1 = require("../repository/user.repository");
 const customApiError_1 = require("../errors/customApiError");
 const aws_s3_service_1 = require("./aws.s3.service");
 const file_item_type_enum_1 = require("../enums/file-item-type.enum");
+const user_presenter_1 = require("../presenters/user.presenter");
 class UserService {
-    async getListUsers() {
-        return await user_repository_1.userRepository.getListUsers();
+    async getListUsers(query) {
+        const [entities, total] = await user_repository_1.userRepository.getListUsers(query);
+        return user_presenter_1.userPresenter.toListResDto(entities, total, query);
     }
     async getById(userId) {
         const user = await user_repository_1.userRepository.getById(userId);

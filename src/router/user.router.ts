@@ -8,7 +8,7 @@ import {avatarConfig} from "../constants/image.constants";
 
 const router = Router();
 
-router.get("/", userController.getList)
+router.get("/",commonMiddleware.isQueryValid(UserValidator.isQuery), userController.getList)
 
 router.get("/me", authMiddleware.checkAccessToken, userController.getMe)
 router.put("/me", authMiddleware.checkAccessToken, commonMiddleware.isBodyValid(UserValidator.update), userController.updateMe)

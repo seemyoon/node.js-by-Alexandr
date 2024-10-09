@@ -24,11 +24,11 @@ class AuthService {
             role: user.role,
         }, ActionTokenTypeEnum.VERIFY_EMAIL)
         await actionTokenRepository.create({_userId: user._id, type: ActionTokenTypeEnum.VERIFY_EMAIL, token})
-        await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.WELCOME,
-            {
-                name: user.name,
-                actionToken: token
-            })
+        // await emailService.sendMail(configs.SMTP_EMAIL, EmailTypeEnum.WELCOME,
+        //     {
+        //         name: user.name,
+        //         actionToken: token
+        //     })
         return {user, tokens}
     }
 
